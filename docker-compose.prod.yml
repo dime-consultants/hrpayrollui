@@ -4,7 +4,7 @@ services:
 
   frontend:
     build: .
-    container_name: hr_frontend
+    container_name: web-ui
     restart: unless-stopped
     ports:
       - "80:80"
