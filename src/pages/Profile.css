@@ -1,0 +1,66 @@
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .profile-grid { grid-template-columns: 2fr 1fr; }
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .profile-form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-account-card {
+  padding: 1.25rem;
+}
+
+.profile-account-card h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 1rem;
+}
+
+.profile-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-account-row dt { color: var(--gray-500); }
+
+.profile-account-id {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: var(--gray-600);
+}

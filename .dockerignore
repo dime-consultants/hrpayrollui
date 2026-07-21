@@ -1,0 +1,8 @@
+node_modules
+dist
+.env*
+*.local
+.git
+.gitignore
+.DS_Store
+Thumbs.db

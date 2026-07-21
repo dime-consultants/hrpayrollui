@@ -1,0 +1,28 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.login-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.25rem;
+}
+
+.login-forgot-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--blue-600);
+  text-decoration: none;
+}
+
+.login-forgot-link:hover {
+  color: var(--blue-700);
+  text-decoration: underline;
+}
+
+.login-submit {
+  margin-top: 0.25rem;
+  width: 100%;
+}

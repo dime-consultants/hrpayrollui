@@ -1,0 +1,46 @@
+.batch-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--blue-600);
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.batch-back-link:hover {
+  text-decoration: underline;
+  color: var(--blue-700);
+}
+
+.batch-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .batch-stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.batch-msg {
+  margin-bottom: 1rem;
+}
+
+.batch-records-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.batch-records-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.batch-header-actions {
+  display: flex;
+  gap: 0.5rem;
+}

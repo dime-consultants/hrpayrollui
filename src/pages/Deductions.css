@@ -1,0 +1,20 @@
+.deductions-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deductions-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .deductions-form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.deduction-name {
+  font-weight: 500;
+  color: var(--gray-900);
+}
