@@ -143,9 +143,9 @@ export const api = {
 export const endpoints = {
   // Auth — custom User uses email as USERNAME_FIELD
   login: (data) =>
-    client.post("/auth/login/", data, { _noAuth: true }).then((r) => r.data),
+    client.post("/auth/signin/", data, { _noAuth: true }).then((r) => r.data),
   tokenRefresh: (refresh) =>
-    client.post("/auth/refresh/", { refresh }).then((r) => r.data),
+    client.post("/auth/token/refresh/", { refresh }).then((r) => r.data),
 
   // Dashboard summary
   dashboard: (params) => api.get("/dashboard/", params),
