@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE =  "hr.dimeapp.co.ke"  ?  "http://localhost:8080"  : null ;
+const API_BASE =  import.meta.env.VITE_API_TARGET || "";
 
 const TOKEN_KEY = "hrp_access";
 const REFRESH_KEY = "hrp_refresh";
