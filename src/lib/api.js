@@ -96,7 +96,7 @@ client.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const res = await axios.post("/api/v1/auth/refresh/", {
+        const res = await client.post("/api/v1/auth/refresh/", {
           refresh: tokenStore.refresh,
         });
         const { access, refresh } = res.data;
