@@ -96,7 +96,7 @@ client.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const res = await axios.post(`${API_BASE}/auth/refresh/`, {
+        const res = await axios.post("/api/v1/auth/refresh/", {
           refresh: tokenStore.refresh,
         });
         const { access, refresh } = res.data;
@@ -142,9 +142,9 @@ export const api = {
 export const endpoints = {
   // Auth — custom User uses email as USERNAME_FIELD
 login: (data) =>
-    client.post("/api/auth/signin/", data, { _noAuth: true }).then((r) => r.data),
+    client.post("/api/v1/auth/login/", data, { _noAuth: true }).then((r) => r.data),
   tokenRefresh: (refresh) =>
-    client.post("/api/auth/token/refresh/", { refresh }).then((r) => r.data),
+    client.post("/api/v1/auth/refresh/", { refresh }).then((r) => r.data),
 
   // Dashboard summary
   dashboard: (params) => api.get("/api/v1/dashboard/", params),
