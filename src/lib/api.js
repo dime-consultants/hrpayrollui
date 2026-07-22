@@ -1,8 +1,7 @@
 import axios from "axios";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  (import.meta.env.DEV ? "http://127.0.0.1:8000/api/v1" : "/api/v1");
+const API_BASE =  "hr.dimeapp.co.ke"  ?  "http://localhost:8080"  : null ;
+
 const TOKEN_KEY = "hrp_access";
 const REFRESH_KEY = "hrp_refresh";
 
@@ -142,44 +141,44 @@ export const api = {
 // ---- Endpoint helpers mapped to Django URL patterns ----
 export const endpoints = {
   // Auth — custom User uses email as USERNAME_FIELD
-  login: (data) =>
-    client.post("/auth/signin/", data, { _noAuth: true }).then((r) => r.data),
+login: (data) =>
+    client.post("/api/auth/signin/", data, { _noAuth: true }).then((r) => r.data),
   tokenRefresh: (refresh) =>
-    client.post("/auth/token/refresh/", { refresh }).then((r) => r.data),
+    client.post("/api/auth/token/refresh/", { refresh }).then((r) => r.data),
 
   // Dashboard summary
-  dashboard: (params) => api.get("/dashboard/", params),
+  dashboard: (params) => api.get("/api/v1/dashboard/", params),
 
   // Organization
-  myOrganization: () => api.get("/organization/"),
+  myOrganization: () => api.get("/api/v1/organization/"),
 
   // HR User management
-  users: (params) => api.get("/users/", params),
-  user: (pk) => api.get(`/users/${pk}/`),
-  createUser: (data) => api.post("/users/", data),
-  deactivateUser: (pk) => api.del(`/users/${pk}/`),
+  users: (params) => api.get("/api/v1/users/", params),
+  user: (pk) => api.get(`/api/v1/users/${pk}/`),
+  createUser: (data) => api.post("/api/v1/users/", data),
+  deactivateUser: (pk) => api.del(`/api/v1/users/${pk}/`),
 
   // Payroll uploads
-  uploads: (params) => api.get("/uploads/", params),
-  upload: (pk) => api.get(`/uploads/${pk}/`),
-  createUpload: (formData) => api.postForm("/uploads/", formData),
-  deleteUpload: (pk) => api.del(`/uploads/${pk}/`),
-  uploadDeductions: (uploadId) => api.get("/deductions/", { upload: uploadId, page_size: 500 }),
+  uploads: (params) => api.get("/api/v1/uploads/", params),
+  upload: (pk) => api.get(`/api/v1/uploads/${pk}/`),
+  createUpload: (formData) => api.postForm("/api/v1/uploads/", formData),
+  deleteUpload: (pk) => api.del(`/api/v1/uploads/${pk}/`),
+  uploadDeductions: (uploadId) => api.get("api/v1/deductions/", { upload: uploadId, page_size: 500 }),
   downloadTemplate: () =>
-    client.get("/uploads/template/", { responseType: "blob" }).then((r) => r.data),
+    client.get("/api/v1/uploads/template/", { responseType: "blob" }).then((r) => r.data),
 
   // Salary deductions
-  deductions: (params) => api.get("/deductions/", params),
-  deduction: (pk) => api.get(`/deductions/${pk}/`),
+  deductions: (params) => api.get("/api/v1/deductions/", params),
+  deduction: (pk) => api.get(`/api/v1/deductions/${pk}/`),
 
   // Repayment batches
-  batches: (params) => api.get("/batches/", params),
-  batch: (pk) => api.get(`/batches/${pk}/`),
-  approveBatch: (pk) => api.post(`/batches/${pk}/approve/`, { confirm: true }),
+  batches: (params) => api.get("/api/v1/batches/", params),
+  batch: (pk) => api.get(`/api/v1/batches/${pk}/`),
+  approveBatch: (pk) => api.post(`/api/v1/batches/${pk}/approve/`, { confirm: true }),
 
   // Repayment records
-  records: (params) => api.get("/records/", params),
+  records: (params) => api.get("/api/v1/records/", params),
 
   // System health
-  health: () => api.get("/health/"),
+  health: () => api.get("/api/v1/health/"),
 };
