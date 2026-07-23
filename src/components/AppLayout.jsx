@@ -3,20 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext.jsx"
 import { useFetch } from "../lib/useFetch.js"
 import { endpoints } from "../lib/api.js"
+import { roleLabel } from "../lib/format.js"
 import dimeCreditLogo from "../assets/dime-credit-logo.jpeg"
 import "./AppLayout.css"
-
-// Raw codes stored on HRUser.role (apps/organizations/models.py ROLE_CHOICES)
-const ROLE_LABELS = {
-  admin: "HR Admin",
-  officer: "Payroll Officer",
-  viewer: "Read-Only Viewer",
-}
-
-function roleLabel(role) {
-  if (!role) return null
-  return ROLE_LABELS[role] || role
-}
 
 const NAV = [
   { to: "/dashboard",   label: "Dashboard",          icon: IconDashboard },
