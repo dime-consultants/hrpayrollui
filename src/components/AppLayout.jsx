@@ -1,8 +1,22 @@
 import { useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext.jsx"
+import { useFetch } from "../lib/useFetch.js"
+import { endpoints } from "../lib/api.js"
 import dimeCreditLogo from "../assets/dime-credit-logo.jpeg"
 import "./AppLayout.css"
+
+// Raw codes stored on HRUser.role (apps/organizations/models.py ROLE_CHOICES)
+const ROLE_LABELS = {
+  admin: "HR Admin",
+  officer: "Payroll Officer",
+  viewer: "Read-Only Viewer",
+}
+
+function roleLabel(role) {
+  if (!role) return null
+  return ROLE_LABELS[role] || role
+}
 
 const NAV = [
   { to: "/dashboard",   label: "Dashboard",          icon: IconDashboard },
@@ -31,13 +45,19 @@ export default function AppLayout({ children }) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
+  // The login response doesn't carry the HR role, so look up the current
+  // user's HRUser record (which does) from the org's user list.
+  const { data: usersData } = useFetch(() => endpoints.users(), [])
+  const hrUsers = Array.isArray(usersData) ? usersData : usersData?.results || []
+  const currentHrUser = hrUsers.find((u) => u.email === user?.email)
+
   const handleLogout = async () => {
     await logout()
     navigate("/login")
   }
 
   const name = displayName(user)
-  const role = user?.role_label || user?.role || (user?.is_staff ? "Staff" : "HR User")
+  const role = roleLabel(currentHrUser?.role) || roleLabel(user?.role) || "HR User"
 
   return (
     <div className="app-shell">

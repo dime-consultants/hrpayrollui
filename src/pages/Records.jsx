@@ -2,7 +2,7 @@ import PageHeader from "../components/PageHeader.jsx"
 import { DataTable } from "../components/Table.jsx"
 import { Badge, Card } from "../components/ui.jsx"
 import { useFetch } from "../lib/useFetch.js"
-import { formatMoney } from "../lib/format.js"
+import { formatMoney, shortId } from "../lib/format.js"
 import { batchStatusVariant } from "../lib/statusVariants.js"
 import "./Records.css"
 
@@ -21,8 +21,9 @@ export default function Records() {
       ),
     },
     { key: "phone",  header: "Phone",  render: (r) => r.phone_number || "—" },
-    { key: "amount", header: "Amount", render: (r) => formatMoney(r.amount ?? r.repayment_amount) },
-    { key: "batch",  header: "Batch",  render: (r) => r.batch_name || r.batch?.name || `#${r.batch_id ?? r.batch ?? "—"}` },
+    { key: "requested", header: "Requested", render: (r) => formatMoney(r.amount_requested) },
+    { key: "sent",      header: "Sent",      render: (r) => formatMoney(r.amount_sent) },
+    { key: "batch",  header: "Batch",  render: (r) => r.batch ? `#${shortId(r.batch)}` : "—" },
     { key: "status", header: "Status", render: (r) => <Badge variant={batchStatusVariant(r.status)}>{r.status || "pending"}</Badge> },
   ]
 
