@@ -47,7 +47,7 @@ function currentPeriod() {
 }
 
 export default function Uploads() {
-  const { data, loading, error, refetch } = useFetch("/uploads/")
+  const { data, loading, error, refetch } = useFetch("/api/v1/uploads/")
   const [file, setFile] = useState(null)
   const [period, setPeriod] = useState(currentPeriod())
   const [uploading, setUploading] = useState(false)
@@ -85,7 +85,7 @@ export default function Uploads() {
       const body = new FormData()
       body.append("file", file)
       body.append("payroll_period", `${period}-01`)
-      const result = await api.postForm("/uploads/", body)
+      const result = await api.postForm("/api/v1/uploads/", body)
       setMsg({ variant: "success", text: `Uploaded "${file.name}" successfully.` })
       setUploadResult(result)
       setFile(null)

@@ -6,7 +6,7 @@ import { formatMoney } from "../lib/format.js"
 import "./Deductions.css"
 
 export default function Deductions() {
-  const { data, loading, error } = useFetch("/deductions/")
+  const { data, loading, error } = useFetch("/api/v1/deductions/")
   const deductions = Array.isArray(data) ? data : data?.results || []
 
   const columns = [

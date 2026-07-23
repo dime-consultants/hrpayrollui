@@ -163,7 +163,7 @@ login: (data) =>
   upload: (pk) => api.get(`/api/v1/uploads/${pk}/`),
   createUpload: (formData) => api.postForm("/api/v1/uploads/", formData),
   deleteUpload: (pk) => api.del(`/api/v1/uploads/${pk}/`),
-  uploadDeductions: (uploadId) => api.get("api/v1/deductions/", { upload: uploadId, page_size: 500 }),
+  uploadDeductions: (uploadId) => api.get("/api/v1/deductions/", { upload: uploadId, page_size: 500 }),
   downloadTemplate: () =>
     client.get("/api/v1/uploads/template/", { responseType: "blob" }).then((r) => r.data),
 

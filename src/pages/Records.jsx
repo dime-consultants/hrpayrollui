@@ -7,7 +7,7 @@ import { batchStatusVariant } from "../lib/statusVariants.js"
 import "./Records.css"
 
 export default function Records() {
-  const { data, loading, error } = useFetch("/records/")
+  const { data, loading, error } = useFetch("/api/v1/records/")
   const records = Array.isArray(data) ? data : data?.results || []
 
   const columns = [

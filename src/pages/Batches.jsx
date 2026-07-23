@@ -27,7 +27,7 @@ export default function Batches() {
     try {
       await endpoints.approveBatch
       const { api } = await import("../lib/api.js")
-      await api.post("/batches/", form)
+      await api.post("/api/v1/batches/", form)
       setOpen(false)
       setForm({ name: "", period_start: "", period_end: "" })
       refetch()

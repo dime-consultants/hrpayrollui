@@ -21,7 +21,7 @@ export default function Profile() {
     setSaving(true)
     setMsg(null)
     try {
-      await api.patch("/me/", form)
+      await api.patch("/api/users/me/", form)
       setMsg({ variant: "success", text: "Profile updated successfully." })
     } catch (err) {
       setMsg({ variant: "error", text: err.message || "Could not update profile." })

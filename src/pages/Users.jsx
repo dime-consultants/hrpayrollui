@@ -20,7 +20,7 @@ function roleVariant(role) {
 }
 
 export default function Users() {
-  const { data, loading, error, refetch } = useFetch("/users/")
+  const { data, loading, error, refetch } = useFetch("/api/v1/users/")
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState("")
@@ -34,7 +34,7 @@ export default function Users() {
     setSaving(true)
     setFormError("")
     try {
-      await api.post("/users/", form)
+      await api.post("/api/v1/users/", form)
       setOpen(false)
       setForm({ email: "", first_name: "", last_name: "", role: "viewer", password: "" })
       refetch()
