@@ -24,7 +24,7 @@ export default function Users() {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState("")
-  const [form, setForm] = useState({ username: "", email: "", first_name: "", last_name: "", role: "viewer", password: "" })
+  const [form, setForm] = useState({ email: "", first_name: "", last_name: "", role: "viewer", password: "" })
 
   const users = Array.isArray(data) ? data : data?.results || []
   function update(key, value) { setForm((f) => ({ ...f, [key]: value })) }
@@ -36,7 +36,7 @@ export default function Users() {
     try {
       await api.post("/api/v1/users/", form)
       setOpen(false)
-      setForm({ username: "", email: "", first_name: "", last_name: "", role: "viewer", password: "" })
+      setForm({ email: "", first_name: "", last_name: "", role: "viewer", password: "" })
       refetch()
     } catch (err) {
       setFormError(err.message || "Could not create user.")
@@ -106,9 +106,6 @@ export default function Users() {
           </div>
           <Field label="Email" required>
             <Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required />
-          </Field>
-          <Field label="Username" required>
-            <Input value={form.username} onChange={(e) => update("username", e.target.value)} required />
           </Field>
           <Field label="Role">
             <Select value={form.role} onChange={(e) => update("role", e.target.value)}>
