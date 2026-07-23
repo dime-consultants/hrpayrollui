@@ -44,19 +44,18 @@ export default function Batches() {
       header: "Organisation",
       render: (b) => (
         <Link to={`/batches/${b.id}`} className="batch-link">
-          {b.organization_name || b.name || `Batch #${b.id}`}
+          {b.organization_name || `Batch #${b.id}`}
         </Link>
       ),
     },
     {
       key: "period",
       header: "Period",
-      render: (b) => b.period_start ? `${formatDate(b.period_start)} – ${formatDate(b.period_end)}` : "—",
+      render: (b) => formatDate(b.date_created),
     },
-    { key: "records", header: "Records", render: (b) => b.record_count ?? b.records_count ?? "—" },
-    { key: "total",   header: "Net total", render: (b) => formatMoney(b.total_net ?? b.net_total) },
+    { key: "records", header: "Records", render: (b) => b.total_deductions ?? "—" },
+    { key: "total",   header: "Net total", render: (b) => formatMoney(b.total_amount) },
     { key: "status",  header: "Status", render: (b) => <Badge variant={batchStatusVariant(b.status)}>{b.status || "draft"}</Badge> },
-    { key: "created", header: "Created", render: (b) => formatDate(b.created_at) },
   ]
 
   return (

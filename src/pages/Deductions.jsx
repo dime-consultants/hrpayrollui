@@ -1,13 +1,22 @@
+import { Link } from "react-router-dom"
 import PageHeader from "../components/PageHeader.jsx"
 import { DataTable } from "../components/Table.jsx"
 import { Badge, Card } from "../components/ui.jsx"
 import { useFetch } from "../lib/useFetch.js"
-import { formatMoney } from "../lib/format.js"
+import { endpoints } from "../lib/api.js"
+import { formatMoney, shortId } from "../lib/format.js"
 import "./Deductions.css"
 
 export default function Deductions() {
   const { data, loading, error } = useFetch("/api/v1/deductions/")
+  const { data: batchData } = useFetch(() => endpoints.batches(), [])
+
   const deductions = Array.isArray(data) ? data : data?.results || []
+  const batches = Array.isArray(batchData) ? batchData : batchData?.results || []
+
+  // SalaryDeduction has no direct batch link — batches are one-to-one with the
+  // upload they were generated from, so join on that shared `upload` id.
+  const batchIdByUpload = Object.fromEntries(batches.map((b) => [b.upload, b.id]))
 
   const columns = [
     { key: "phone",   header: "Phone",         render: (d) => d.phone_number || "—" },
@@ -22,7 +31,14 @@ export default function Deductions() {
         return <Badge variant={v}>{d.status || "pending"}</Badge>
       },
     },
-    { key: "batch",   header: "Batch",          render: (d) => d.batch_name || d.batch?.name || `#${d.batch_id ?? d.batch ?? "—"}` },
+    {
+      key: "batch",
+      header: "Batch",
+      render: (d) => {
+        const batchId = batchIdByUpload[d.upload]
+        return batchId ? <Link to={`/batches/${batchId}`}>#{shortId(batchId)}</Link> : "—"
+      },
+    },
   ]
 
   return (
