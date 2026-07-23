@@ -24,6 +24,7 @@ export default function Users() {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState("")
+  const [msg, setMsg] = useState(null)
   const [form, setForm] = useState({ email: "", first_name: "", last_name: "", role: "viewer", password: "" })
 
   const users = Array.isArray(data) ? data : data?.results || []
@@ -37,6 +38,7 @@ export default function Users() {
       await api.post("/api/v1/users/", form)
       setOpen(false)
       setForm({ email: "", first_name: "", last_name: "", role: "viewer", password: "" })
+      setMsg({ variant: "success", text: "User created successfully." })
       refetch()
     } catch (err) {
       setFormError(err.message || "Could not create user.")
@@ -76,6 +78,8 @@ export default function Users() {
         subtitle="Manage HR officers and administrators in your organization."
         actions={<Button onClick={() => setOpen(true)}>Add user</Button>}
       />
+
+      {msg && <Alert variant={msg.variant}>{msg.text}</Alert>}
 
       <Card className="p-0">
         <DataTable columns={columns} rows={users} loading={loading} error={error} empty="No users found." />

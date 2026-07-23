@@ -41,3 +41,15 @@ export function shortId(id) {
   if (!id) return "-"
   return String(id).slice(0, 8)
 }
+
+// Raw codes stored on HRUser.role (apps/organizations/models.py ROLE_CHOICES)
+const ROLE_LABELS = {
+  admin: "HR Admin",
+  officer: "Payroll Officer",
+  viewer: "Read-Only Viewer",
+}
+
+export function roleLabel(role) {
+  if (!role) return null
+  return ROLE_LABELS[role] || role
+}

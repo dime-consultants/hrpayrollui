@@ -2,11 +2,20 @@ import { useState } from "react"
 import PageHeader from "../components/PageHeader.jsx"
 import { Button, Card, Field, Input, Alert, Badge } from "../components/ui.jsx"
 import { useAuth } from "../context/AuthContext.jsx"
-import { api } from "../lib/api.js"
+import { useFetch } from "../lib/useFetch.js"
+import { api, endpoints } from "../lib/api.js"
+import { roleLabel } from "../lib/format.js"
 import "./Profile.css"
 
 export default function Profile() {
   const { user } = useAuth()
+
+  // The login response doesn't carry the HR role, so look up the current
+  // user's HRUser record (which does) from the org's user list.
+  const { data: usersData } = useFetch(() => endpoints.users(), [])
+  const hrUsers = Array.isArray(usersData) ? usersData : usersData?.results || []
+  const currentHrUser = hrUsers.find((u) => u.email === user?.email)
+
   const [form, setForm] = useState({
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
@@ -63,7 +72,7 @@ export default function Profile() {
             <dl className="profile-account-list">
               <div className="profile-account-row">
                 <dt>Role</dt>
-                <dd><Badge variant="blue">{user?.role || "hr-user"}</Badge></dd>
+                <dd><Badge variant="blue">{roleLabel(currentHrUser?.role) || roleLabel(user?.role) || "HR User"}</Badge></dd>
               </div>
               <div className="profile-account-row">
                 <dt>Status</dt>

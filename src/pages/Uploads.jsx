@@ -132,9 +132,9 @@ export default function Uploads() {
   const columns = [
     { key: "id",   header: "ID",       render: (u) => <span className="upload-id">#{u.id}</span> },
     { key: "file", header: "File",     render: (u) => <span className="upload-file-label">{u.file_name || u.original_filename || u.file || "—"}</span> },
-    { key: "rows", header: "Rows",     render: (u) => u.row_count ?? u.records_count ?? "—" },
+    { key: "rows", header: "Rows",     render: (u) => u.total_rows ?? "—" },
     { key: "status", header: "Status", render: (u) => <Badge variant={statusVariant(u.status)}>{statusLabel(u.status)}</Badge> },
-    { key: "date", header: "Uploaded", render: (u) => formatDate(u.created_at || u.uploaded_at) },
+    { key: "date", header: "Uploaded", render: (u) => formatDate(u.date_created) },
     {
       key: "actions", header: "",
       render: (u) => (
