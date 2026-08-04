@@ -10,6 +10,22 @@ import { loanStatusVariant } from "../lib/statusVariants.js"
 import "./Uploads.css"
 import "./LoanRequests.css"
 
+async function downloadLoanRequestTemplate() {
+  const XLSX = await import("xlsx")
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    ["phone_number", "amount"],
+    ["'254712345678", "5000"],
+  ])
+  // Force the phone_number column to Text so Excel doesn't strip the
+  // leading apostrophe or coerce the value into a number.
+  worksheet["A2"].t = "s"
+  worksheet["A2"].z = "@"
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }]
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
+  XLSX.writeFile(workbook, "loan_request_template.xlsx")
+}
+
 function UploadCloudIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -47,9 +63,21 @@ export default function LoanRequests() {
   const [period, setPeriod] = useState(currentPeriod())
   const [notes, setNotes] = useState("")
   const [uploading, setUploading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [msg, setMsg] = useState(null)
 
   const uploads = Array.isArray(data) ? data : data?.results || []
+
+  async function handleDownloadTemplate() {
+    setDownloading(true)
+    try {
+      await downloadLoanRequestTemplate()
+    } catch {
+      setMsg({ variant: "error", text: "Could not generate template." })
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   async function handleUpload(e) {
     e.preventDefault()
@@ -133,6 +161,19 @@ export default function LoanRequests() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
+            <button
+              type="button"
+              className="upload-template-btn"
+              onClick={handleDownloadTemplate}
+              disabled={downloading}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {downloading ? "Preparing…" : "Download template"}
+            </button>
             <Button type="submit" disabled={!file || uploading}>
               {uploading ? "Uploading…" : "Upload file"}
             </Button>
