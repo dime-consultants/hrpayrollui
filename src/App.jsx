@@ -14,6 +14,10 @@ import Deductions from "./pages/Deductions.jsx";
 import Batches from "./pages/Batches.jsx";
 import BatchDetail from "./pages/BatchDetail.jsx";
 import Records from "./pages/Records.jsx";
+import LoanRequests from "./pages/LoanRequests.jsx";
+import LoanUploadDetail from "./pages/LoanUploadDetail.jsx";
+import LoanBatches from "./pages/LoanBatches.jsx";
+import LoanBatchDetail from "./pages/LoanBatchDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
@@ -132,6 +136,38 @@ export default function App() {
         element={
           <Protected>
             <Records />
+          </Protected>
+        }
+      />
+      <Route
+        path="/loan-requests"
+        element={
+          <Protected>
+            <LoanRequests />
+          </Protected>
+        }
+      />
+      <Route
+        path="/loan-requests/:id"
+        element={
+          <Protected>
+            <LoanUploadDetail />
+          </Protected>
+        }
+      />
+      <Route
+        path="/loan-batches"
+        element={
+          <Protected>
+            <LoanBatches />
+          </Protected>
+        }
+      />
+      <Route
+        path="/loan-batches/:id"
+        element={
+          <Protected>
+            <LoanBatchDetail />
           </Protected>
         }
       />
