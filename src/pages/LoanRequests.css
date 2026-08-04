@@ -1,0 +1,76 @@
+.loan-notes-input {
+  flex: 1;
+  margin-right: 0.75rem;
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  color: var(--gray-900);
+  background: var(--white);
+}
+
+.loan-notes-input:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px var(--blue-100);
+}
+
+.loan-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--blue-600);
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.loan-back-link:hover {
+  text-decoration: underline;
+  color: var(--blue-700);
+}
+
+.loan-link {
+  color: var(--blue-600);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.loan-link:hover {
+  text-decoration: underline;
+  color: var(--blue-700);
+}
+
+.loan-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .loan-stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.loan-msg {
+  margin-bottom: 1rem;
+}
+
+.loan-section-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loan-section-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.loan-section {
+  margin-bottom: 1.5rem;
+}

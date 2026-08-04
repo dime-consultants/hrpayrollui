@@ -179,6 +179,17 @@ login: (data) =>
   // Repayment records
   records: (params) => api.get("/api/v1/records/", params),
 
+  // Loan request uploads (note: mounted at /api/loans/, not /api/v1/)
+  loanUploads: (params) => api.get("/api/loans/uploads/", params),
+  loanUpload: (pk) => api.get(`/api/loans/uploads/${pk}/`),
+  createLoanUpload: (formData) => api.postForm("/api/loans/uploads/", formData),
+  loanUploadStatus: (pk) => api.get(`/api/loans/uploads/${pk}/status/`),
+  loanUploadRequests: (uploadId, params) => api.get(`/api/loans/uploads/${uploadId}/requests/`, params),
+
+  // Loan request batches
+  loanBatches: (params) => api.get("/api/loans/batches/", params),
+  loanBatch: (pk) => api.get(`/api/loans/batches/${pk}/`),
+
   // System health
   health: () => api.get("/api/v1/health/"),
 };

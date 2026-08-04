@@ -15,7 +15,8 @@ const NAV = [
   { to: "/deductions",  label: "Deductions",          icon: IconReceipt },
   { to: "/batches",     label: "Repayment Batches",   icon: IconLayers },
   { to: "/records",     label: "Repayment Records",   icon: IconList },
-  // { to: "/loan-requests", label: "Loan Requests", icon: IconCreditCard },
+  { to: "/loan-requests", label: "Loan Requests",     icon: IconCreditCard },
+  { to: "/loan-batches",  label: "Loan Batches",       icon: IconStack },
 ]
 
 function displayName(user) {
@@ -195,6 +196,26 @@ function IconList() {
       <circle cx="3" cy="6" r="1" fill="currentColor" />
       <circle cx="3" cy="12" r="1" fill="currentColor" />
       <circle cx="3" cy="18" r="1" fill="currentColor" />
+    </svg>
+  )
+}
+
+function IconCreditCard() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <line x1="2" y1="10" x2="22" y2="10" />
+      <line x1="6" y1="15" x2="10" y2="15" />
+    </svg>
+  )
+}
+
+function IconStack() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <ellipse cx="12" cy="6" rx="8" ry="3" />
+      <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" />
+      <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
     </svg>
   )
 }
