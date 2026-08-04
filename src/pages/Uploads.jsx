@@ -55,6 +55,37 @@ function statusLabel(status) {
   return STATUS_LABELS[status] || status
 }
 
+// The template file itself comes from the backend, but phone numbers in the
+// example rows arrive as plain numeric-looking strings. Excel will happily
+// mangle those (scientific notation, dropped leading digits) unless the
+// column is forced to Text. Post-process the downloaded file client-side so
+// column A reads '254712486391 and is formatted as Text.
+async function forcePhoneColumnToText(blob) {
+  const XLSX = await import("xlsx")
+  const buffer = await blob.arrayBuffer()
+  const workbook = XLSX.read(buffer, { type: "array" })
+  const sheetName = workbook.SheetNames[0]
+  const worksheet = workbook.Sheets[sheetName]
+  if (!worksheet["!ref"]) return blob
+
+  const range = XLSX.utils.decode_range(worksheet["!ref"])
+  for (let row = range.s.r + 1; row <= range.e.r; row++) {
+    const cellRef = XLSX.utils.encode_cell({ r: row, c: 0 })
+    const cell = worksheet[cellRef]
+    if (!cell || cell.v == null || cell.v === "") continue
+    const digits = String(cell.v).replace(/^'/, "")
+    cell.v = `'${digits}`
+    cell.t = "s"
+    cell.z = "@"
+    delete cell.w
+  }
+
+  const outBuffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" })
+  return new Blob([outBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  })
+}
+
 function currentPeriod() {
   const now = new Date()
   const y = now.getFullYear()
@@ -79,7 +110,8 @@ export default function Uploads() {
     setDownloading(true)
     try {
       const blob = await endpoints.downloadTemplate()
-      const url = URL.createObjectURL(blob)
+      const outBlob = await forcePhoneColumnToText(blob)
+      const url = URL.createObjectURL(outBlob)
       const a = document.createElement("a")
       a.href = url
       a.download = "payroll_upload_template.xlsx"
