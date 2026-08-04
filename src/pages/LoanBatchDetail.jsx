@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader.jsx";
 import { DataTable } from "../components/Table.jsx";
@@ -55,6 +56,16 @@ export default function LoanBatchDetail() {
   const failedCount     = requestsLoaded ? tally.failed     : (batch?.failed_count     ?? 0);
   const pendingCount    = requestsLoaded ? tally.pending    : (batch?.skipped_count    ?? 0);
   const flaggedCount    = ineligibleCount + failedCount;
+
+  const [search, setSearch] = useState("");
+  const query = search.trim().toLowerCase();
+  const filteredRequests = query
+    ? requests.filter((r) =>
+        [r.employee_name, r.phone_number, r.employee_id]
+          .filter(Boolean)
+          .some((field) => String(field).toLowerCase().includes(query)),
+      )
+    : requests;
 
   const columns = [
     { key: "row", header: "#", render: (r) => r.row_number || "—" },
@@ -132,10 +143,7 @@ export default function LoanBatchDetail() {
           label="Total amount"
           value={formatMoney(batch?.total_amount)}
         />
-        <StatCard
-          label="Successful amount"
-          value={formatMoney(batch?.successful_amount)}
-        />
+        
       </div>
 
       <div className="loan-stats-grid loan-stats-grid-5">
@@ -149,16 +157,26 @@ export default function LoanBatchDetail() {
       <Card className="p-0">
         <div className="loan-section-header">
           <h3>Loan requests</h3>
-          <Badge variant={flaggedCount > 0 ? "red" : "green"}>
-            {flaggedCount} flagged
-          </Badge>
+          <div className="loan-section-header-actions">
+            <input
+              type="search"
+              className="loan-search-input"
+              placeholder="Search name, phone, or ID…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search loan requests"
+            />
+            <Badge variant={flaggedCount > 0 ? "red" : "green"}>
+              {flaggedCount} flagged
+            </Badge>
+          </div>
         </div>
         <DataTable
           columns={columns}
-          rows={requests}
+          rows={filteredRequests}
           loading={reqLoading}
           error={reqError}
-          empty="No loan requests in this batch."
+          empty={requests.length === 0 ? "No loan requests in this batch." : "No requests match your search."}
         />
       </Card>
     </div>
