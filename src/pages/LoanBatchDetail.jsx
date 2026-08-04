@@ -105,7 +105,10 @@ export default function LoanBatchDetail() {
           label="Total amount"
           value={formatMoney(batch?.total_amount)}
         />
-        <StatCard label="Phone Number" value={batch?.phone_number || "—"} />
+        <StatCard
+          label="Successful amount"
+          value={formatMoney(batch?.successful_amount)}
+        />
       </div>
 
       <div className="loan-stats-grid">
