@@ -28,6 +28,33 @@ export default function LoanBatchDetail() {
   );
 
   const requests = Array.isArray(reqData) ? reqData : reqData?.results || [];
+  const requestsLoaded = Array.isArray(reqData) || Array.isArray(reqData?.results);
+
+  // Tally directly off the fetched requests so every card and the flagged
+  // count in the section header are derived from the same numbers and
+  // always add up to the total — the batch's own counter fields
+  // (eligible_count etc.) are only refreshed at specific points in the
+  // dispatch pipeline and can drift out of sync with live request statuses.
+  const tally = requests.reduce(
+    (acc, r) => {
+      acc.total += 1;
+      if (r.status === "eligible") acc.eligible += 1;
+      else if (r.status === "ineligible") acc.ineligible += 1;
+      else if (r.status === "success") acc.successful += 1;
+      else if (r.status === "failed") acc.failed += 1;
+      else acc.pending += 1; // queued, eligibility_checking, processing, skipped
+      return acc;
+    },
+    { total: 0, eligible: 0, ineligible: 0, successful: 0, failed: 0, pending: 0 },
+  );
+
+  const totalRequests   = requestsLoaded ? tally.total      : (batch?.total_requests   ?? 0);
+  const eligibleCount   = requestsLoaded ? tally.eligible   : (batch?.eligible_count   ?? 0);
+  const ineligibleCount = requestsLoaded ? tally.ineligible : (batch?.ineligible_count ?? 0);
+  const successfulCount = requestsLoaded ? tally.successful : (batch?.successful_count ?? 0);
+  const failedCount     = requestsLoaded ? tally.failed     : (batch?.failed_count     ?? 0);
+  const pendingCount    = requestsLoaded ? tally.pending    : (batch?.skipped_count    ?? 0);
+  const flaggedCount    = ineligibleCount + failedCount;
 
   const columns = [
     { key: "row", header: "#", render: (r) => r.row_number || "—" },
@@ -100,7 +127,7 @@ export default function LoanBatchDetail() {
             {batch?.status || "—"}
           </Badge>
         </StatCard>
-        <StatCard label="Total requests" value={batch?.total_requests ?? 0} />
+        <StatCard label="Total requests" value={totalRequests} />
         <StatCard
           label="Total amount"
           value={formatMoney(batch?.total_amount)}
@@ -111,16 +138,20 @@ export default function LoanBatchDetail() {
         />
       </div>
 
-      <div className="loan-stats-grid">
-        <StatCard label="Eligible" value={batch?.eligible_count ?? 0} />
-        <StatCard label="Ineligible" value={batch?.ineligible_count ?? 0} />
-        <StatCard label="Successful" value={batch?.successful_count ?? 0} />
-        <StatCard label="Failed" value={batch?.failed_count ?? 0} />
+      <div className="loan-stats-grid loan-stats-grid-5">
+        <StatCard label="Eligible" value={eligibleCount} />
+        <StatCard label="Ineligible" value={ineligibleCount} />
+        <StatCard label="Successful" value={successfulCount} />
+        <StatCard label="Failed" value={failedCount} />
+        <StatCard label="Pending" value={pendingCount} />
       </div>
 
       <Card className="p-0">
         <div className="loan-section-header">
           <h3>Loan requests</h3>
+          <Badge variant={flaggedCount > 0 ? "red" : "green"}>
+            {flaggedCount} flagged
+          </Badge>
         </div>
         <DataTable
           columns={columns}
