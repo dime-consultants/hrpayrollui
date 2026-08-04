@@ -25,7 +25,7 @@ export default function LoanBatches() {
     { key: "organization", header: "Organisation", render: (b) => b.organization_name || "—" },
     { key: "requests", header: "Requests", render: (b) => b.total_requests ?? "—" },
     { key: "total", header: "Total amount", render: (b) => formatMoney(b.total_amount) },
-    { key: "successful", header: "Successful amount", render: (b) => formatMoney(b.successful_amount) },
+    {key: "phone", header: "Phone Number", render: (b) => b.phone_number ?? "--"},
     { key: "status", header: "Status", render: (b) => <Badge variant={loanStatusVariant(b.status)}>{b.status || "draft"}</Badge> },
     { key: "date", header: "Created", render: (b) => formatDate(b.date_created) },
   ]
