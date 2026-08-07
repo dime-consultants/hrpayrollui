@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import PageHeader from "../components/PageHeader.jsx"
 import { DataTable } from "../components/Table.jsx"
-import { Badge, Button, Card, Alert } from "../components/ui.jsx"
+import { Badge, Button, Card, Alert, Modal, Field, Input } from "../components/ui.jsx"
 import { useFetch } from "../lib/useFetch.js"
 import { endpoints } from "../lib/api.js"
 import { formatDate } from "../lib/format.js"
@@ -24,6 +24,23 @@ async function downloadLoanRequestTemplate() {
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
   XLSX.writeFile(workbook, "loan_request_template.xlsx")
+}
+
+async function buildIndividualLoanFile(phoneNumber, amount) {
+  const XLSX = await import("xlsx")
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    ["phone_number", "amount"],
+    [phoneNumber, amount],
+  ])
+  worksheet["A2"].t = "s"
+  worksheet["A2"].z = "@"
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }]
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
+  const buffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" })
+  return new File([buffer], `individual_loan_request_${Date.now()}.xlsx`, {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  })
 }
 
 function UploadCloudIcon() {
@@ -65,6 +82,11 @@ export default function LoanRequests() {
   const [uploading, setUploading] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [msg, setMsg] = useState(null)
+  const [indivOpen, setIndivOpen] = useState(false)
+  const [indivPhone, setIndivPhone] = useState("")
+  const [indivAmount, setIndivAmount] = useState("")
+  const [indivSubmitting, setIndivSubmitting] = useState(false)
+  const [indivError, setIndivError] = useState(null)
 
   const uploads = Array.isArray(data) ? data : data?.results || []
 
@@ -101,6 +123,38 @@ export default function LoanRequests() {
     }
   }
 
+  function closeIndividualModal() {
+    if (indivSubmitting) return
+    setIndivOpen(false)
+    setIndivPhone("")
+    setIndivAmount("")
+    setIndivError(null)
+  }
+
+  async function handleIndividualSubmit(e) {
+    e.preventDefault()
+    setIndivSubmitting(true)
+    setIndivError(null)
+    try {
+      const phone = indivPhone.trim()
+      const file = await buildIndividualLoanFile(phone, indivAmount)
+      const body = new FormData()
+      body.append("file", file)
+      body.append("loan_period", `${period}-01`)
+      body.append("notes", `Individual loan request — ${phone}`)
+      await endpoints.createLoanUpload(body)
+      setMsg({ variant: "success", text: `Loan request for ${phone} submitted successfully. Awaiting admin approval.` })
+      setIndivOpen(false)
+      setIndivPhone("")
+      setIndivAmount("")
+      refetch()
+    } catch (err) {
+      setIndivError(err.message || "Could not submit loan request.")
+    } finally {
+      setIndivSubmitting(false)
+    }
+  }
+
   const columns = [
     {
       key: "file",
@@ -123,7 +177,12 @@ export default function LoanRequests() {
       <PageHeader
         title="Loan Requests"
         subtitle="Upload employee loan request batches for admin approval and processing."
-        actions={<Button as={Link} to="/loan-batches" variant="ghost">View batches</Button>}
+        actions={
+          <>
+            <Button variant="secondary" onClick={() => setIndivOpen(true)}>Individual loan request</Button>
+            <Button as={Link} to="/loan-batches" variant="ghost">View batches</Button>
+          </>
+        }
       />
 
       <Card className="upload-card">
@@ -184,6 +243,46 @@ export default function LoanRequests() {
       <Card className="p-0">
         <DataTable columns={columns} rows={uploads} loading={loading} error={error} empty="No loan request uploads yet." />
       </Card>
+
+      <Modal
+        open={indivOpen}
+        onClose={closeIndividualModal}
+        title="Individual loan request"
+        footer={
+          <>
+            <Button variant="ghost" onClick={closeIndividualModal} disabled={indivSubmitting}>Cancel</Button>
+            <Button type="submit" form="individual-loan-form" disabled={indivSubmitting}>
+              {indivSubmitting ? "Submitting…" : "Submit request"}
+            </Button>
+          </>
+        }
+      >
+        <form id="individual-loan-form" onSubmit={handleIndividualSubmit}>
+          {indivError && <Alert variant="error">{indivError}</Alert>}
+          <Field label="Phone number" required>
+            <Input
+              type="tel"
+              name="phone_number"
+              placeholder="254712345678"
+              value={indivPhone}
+              onChange={(e) => setIndivPhone(e.target.value)}
+              required
+            />
+          </Field>
+          <Field label="Amount" required>
+            <Input
+              type="number"
+              name="amount"
+              min="1"
+              step="0.01"
+              placeholder="5000"
+              value={indivAmount}
+              onChange={(e) => setIndivAmount(e.target.value)}
+              required
+            />
+          </Field>
+        </form>
+      </Modal>
     </div>
   )
 }
