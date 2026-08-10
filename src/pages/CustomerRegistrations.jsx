@@ -10,7 +10,7 @@ import "./CustomerRegistrations.css"
 
 const STATUS_LABELS = {
   approval_pending: "Approval Pending",
-  approved: "Approved",
+  active: "Active",
   processing: "Processing",
   done: "Completed",
   partial: "Partially Processed",
