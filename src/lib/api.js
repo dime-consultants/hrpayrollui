@@ -190,6 +190,12 @@ login: (data) =>
   loanBatches: (params) => api.get("/api/loans/batches/", params),
   loanBatch: (pk) => api.get(`/api/loans/batches/${pk}/`),
 
+  // Customer registrations (KYC onboarding — note: mounted at /api/customers/)
+  customerRegistrations: (params) => api.get("/api/customers/registrations/", params),
+  customerRegistration: (pk) => api.get(`/api/customers/registrations/${pk}/`),
+  createCustomerRegistration: (formData) => api.postForm("/api/customers/registrations/", formData),
+  customerRegistrationStatus: (pk) => api.get(`/api/customers/registrations/${pk}/status/`),
+
   // System health
   health: () => api.get("/api/v1/health/"),
 };

@@ -15,6 +15,7 @@ const NAV = [
   { to: "/deductions",  label: "Deductions",          icon: IconReceipt },
   { to: "/batches",     label: "Repayment Batches",   icon: IconLayers },
   { to: "/records",     label: "Repayment Records",   icon: IconList },
+  { to: "/customers",   label: "Customer Registrations", icon: IconIdCard },
   { to: "/loan-requests", label: "Loan Requests",     icon: IconCreditCard },
   { to: "/loan-batches",  label: "Loan Batches",       icon: IconStack },
 ]
@@ -196,6 +197,18 @@ function IconList() {
       <circle cx="3" cy="6" r="1" fill="currentColor" />
       <circle cx="3" cy="12" r="1" fill="currentColor" />
       <circle cx="3" cy="18" r="1" fill="currentColor" />
+    </svg>
+  )
+}
+
+function IconIdCard() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <circle cx="8" cy="11" r="2" />
+      <path d="M5 17c0-1.66 1.34-3 3-3s3 1.34 3 3" />
+      <line x1="14" y1="9" x2="19" y2="9" />
+      <line x1="14" y1="13" x2="19" y2="13" />
     </svg>
   )
 }

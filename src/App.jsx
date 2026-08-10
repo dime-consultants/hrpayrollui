@@ -16,6 +16,7 @@ import BatchDetail from "./pages/BatchDetail.jsx";
 import Records from "./pages/Records.jsx";
 import LoanRequests from "./pages/LoanRequests.jsx";
 import LoanUploadDetail from "./pages/LoanUploadDetail.jsx";
+import CustomerRegistrations from "./pages/CustomerRegistrations.jsx";
 import LoanBatches from "./pages/LoanBatches.jsx";
 import LoanBatchDetail from "./pages/LoanBatchDetail.jsx";
 import Profile from "./pages/Profile.jsx";
@@ -152,6 +153,14 @@ export default function App() {
         element={
           <Protected>
             <LoanUploadDetail />
+          </Protected>
+        }
+      />
+      <Route
+        path="/customers"
+        element={
+          <Protected>
+            <CustomerRegistrations />
           </Protected>
         }
       />
