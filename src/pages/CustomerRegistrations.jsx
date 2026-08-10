@@ -10,7 +10,7 @@ import "./CustomerRegistrations.css"
 
 const STATUS_LABELS = {
   approval_pending: "Approval Pending",
-  approved: "Approved",
+  active: "Active",
   processing: "Processing",
   done: "Completed",
   partial: "Partially Processed",
@@ -49,6 +49,24 @@ const EMPTY_FILES = {
   national_id_back: null,
   passport_photo: null,
   selfie_photo: null,
+}
+
+function FileChooser({ file, onChange, accept = "image/*", required }) {
+  return (
+    <label className="file-chooser">
+      <span className="file-chooser-btn">Choose file</span>
+      <span className={`file-chooser-name${file ? " has-file" : ""}`}>
+        {file ? file.name : "No file chosen"}
+      </span>
+      <input
+        type="file"
+        accept={accept}
+        className="file-chooser-input"
+        onChange={(e) => onChange(e.target.files?.[0] || null)}
+        required={required}
+      />
+    </label>
+  )
 }
 
 function kycSummary(docs) {
@@ -245,41 +263,33 @@ export default function CustomerRegistrations() {
           {isNationalId ? (
             <div className="registration-form-grid">
               <Field label="National ID — front" required>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="registration-file-input"
-                  onChange={(e) => updateFile("national_id_front", e.target.files?.[0] || null)}
+                <FileChooser
+                  file={files.national_id_front}
+                  onChange={(f) => updateFile("national_id_front", f)}
                   required
                 />
               </Field>
               <Field label="National ID — back" required>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="registration-file-input"
-                  onChange={(e) => updateFile("national_id_back", e.target.files?.[0] || null)}
+                <FileChooser
+                  file={files.national_id_back}
+                  onChange={(f) => updateFile("national_id_back", f)}
                   required
                 />
               </Field>
             </div>
           ) : (
             <Field label="Passport photo" required>
-              <input
-                type="file"
-                accept="image/*"
-                className="registration-file-input"
-                onChange={(e) => updateFile("passport_photo", e.target.files?.[0] || null)}
+              <FileChooser
+                file={files.passport_photo}
+                onChange={(f) => updateFile("passport_photo", f)}
                 required
               />
             </Field>
           )}
           <Field label="Selfie photo" required>
-            <input
-              type="file"
-              accept="image/*"
-              className="registration-file-input"
-              onChange={(e) => updateFile("selfie_photo", e.target.files?.[0] || null)}
+            <FileChooser
+              file={files.selfie_photo}
+              onChange={(f) => updateFile("selfie_photo", f)}
               required
             />
           </Field>

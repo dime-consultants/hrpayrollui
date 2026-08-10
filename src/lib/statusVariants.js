@@ -7,9 +7,10 @@ export function batchStatusVariant(status) {
 }
 
 // Statuses used by apps/loans (LoanRequestUpload, LoanRequest, LoanRequestBatch)
+// and apps/customers (CustomerRegistration — "active" is its post-approval status)
 export function loanStatusVariant(status) {
   const s = (status || "").toLowerCase()
-  if (["done", "complete", "success", "eligible", "approved"].includes(s)) return "green"
+  if (["done", "complete", "success", "eligible", "approved", "active"].includes(s)) return "green"
   if (["failed", "ineligible"].includes(s)) return "red"
   if (["partial"].includes(s)) return "orange"
   if (["skipped"].includes(s)) return "slate"
