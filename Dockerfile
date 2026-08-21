@@ -1,40 +1,38 @@
-# ---------- Stage 1: Build ----------
-FROM node:20-alpine AS builder
+# Build stage
+FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 
+FROM base AS builder
 WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci --prefer-offline
-
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 COPY . .
 
-# Build-time variable for Vite
-ARG VITE_API_TARGET
-ENV VITE_API_TARGET=${VITE_API_TARGET}
+ARG NEXT_PUBLIC_BACKEND_URL
+ARG NEXT_PUBLIC_ALLOWED_HOSTS
+ARG NEXT_PUBLIC_USE_LOCALSTORAGE_TOKENS=false
+ARG NEXT_PUBLIC_DEFAULT_DEMO_MODE=false
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+ENV NEXT_PUBLIC_ALLOWED_HOSTS=$NEXT_PUBLIC_ALLOWED_HOSTS
+ENV NEXT_PUBLIC_USE_LOCALSTORAGE_TOKENS=$NEXT_PUBLIC_USE_LOCALSTORAGE_TOKENS
+ENV NEXT_PUBLIC_DEFAULT_DEMO_MODE=$NEXT_PUBLIC_DEFAULT_DEMO_MODE
 
-RUN echo "Building with API: ${VITE_API_TARGET}"
+RUN yarn build
 
-RUN npm run build
+# Production stage
+FROM base AS runner
+WORKDIR /app
 
-# ---------- Stage 2: Production ----------
-FROM nginx:1.27-alpine
+# Copy everything from builder; no second install at all
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
 
-RUN mkdir -p /etc/nginx/sites-available \
-             /etc/nginx/sites-enabled
-
-COPY nginx/nginx.conf /etc/nginx/sites-available/payroll.dimeapp.co.ke
-
-RUN ln -sf /etc/nginx/sites-available/payroll.dimeapp.co.ke \
-            /etc/nginx/sites-enabled/payroll.dimeapp.co.ke
-
-RUN rm -f /etc/nginx/conf.d/default.conf
-
-RUN sed -i '/include \/etc\/nginx\/conf\.d\/\*\.conf;/a\
-    include /etc/nginx/sites-enabled/*;' \
-    /etc/nginx/nginx.conf
-
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+USER nextjs
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1
+CMD ["yarn", "start"]
