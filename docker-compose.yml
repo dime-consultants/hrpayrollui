@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  guardian-ui:
+    container_name: ${SHARED_ENV}_hrpayroll_ui
+    image: ${IMAGE_TAG}
+
+    ports:
+      - "${API_PORT}:3000"
+
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: "3000"
+
+    networks:
+      - hrpayroll-network
+
+networks:
+  guardian-network:
+    name: ${SHARED_ENV}_hrpayroll_network
+    driver: bridge
