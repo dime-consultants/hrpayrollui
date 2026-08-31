@@ -6,23 +6,15 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-
 RUN npm run build
 
+FROM nginx:alpine AS runner
 
-FROM node:24-alpine AS runner
+WORKDIR /usr/share/nginx/html
 
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json ./package.json
-
-# Only copy public if the folder actually exists
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/dist ./
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
