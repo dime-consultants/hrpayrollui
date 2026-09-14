@@ -82,6 +82,18 @@ export default function LoanBatchDetail() {
       ),
     },
     {
+      key: "guarantor",
+      header: "Guarantor",
+      render: (r) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{r.guarantor_id_number || "—"}</div>
+          <div style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>
+            {r.guarantor_phone_number}
+          </div>
+        </div>
+      ),
+    },
+    {
       key: "amount",
       header: "Requested",
       render: (r) => formatMoney(r.requested_amount),

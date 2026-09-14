@@ -13,28 +13,32 @@ import "./LoanRequests.css"
 async function downloadLoanRequestTemplate() {
   const XLSX = await import("xlsx")
   const worksheet = XLSX.utils.aoa_to_sheet([
-    ["phone_number", "amount"],
-    ["'254712345678", "5000"],
+    ["phone_number", "amount", "guarantor_id_number", "guarantor_phone_number"],
+    ["'254712345678", "5000", "12345678", "'254798765432"],
   ])
-  // Force the phone_number column to Text so Excel doesn't strip the
-  // leading apostrophe or coerce the value into a number.
+  // Force the phone_number and guarantor_phone_number columns to Text so
+  // Excel doesn't strip the leading apostrophe or coerce the value into a number.
   worksheet["A2"].t = "s"
   worksheet["A2"].z = "@"
-  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }]
+  worksheet["D2"].t = "s"
+  worksheet["D2"].z = "@"
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }, { wch: 20 }, { wch: 22 }]
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
   XLSX.writeFile(workbook, "loan_request_template.xlsx")
 }
 
-async function buildIndividualLoanFile(phoneNumber, amount) {
+async function buildIndividualLoanFile(phoneNumber, amount, guarantorIdNumber, guarantorPhoneNumber) {
   const XLSX = await import("xlsx")
   const worksheet = XLSX.utils.aoa_to_sheet([
-    ["phone_number", "amount"],
-    [phoneNumber, amount],
+    ["phone_number", "amount", "guarantor_id_number", "guarantor_phone_number"],
+    [phoneNumber, amount, guarantorIdNumber, guarantorPhoneNumber],
   ])
   worksheet["A2"].t = "s"
   worksheet["A2"].z = "@"
-  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }]
+  worksheet["D2"].t = "s"
+  worksheet["D2"].z = "@"
+  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }, { wch: 20 }, { wch: 22 }]
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
   const buffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" })
@@ -85,6 +89,8 @@ export default function LoanRequests() {
   const [indivOpen, setIndivOpen] = useState(false)
   const [indivPhone, setIndivPhone] = useState("")
   const [indivAmount, setIndivAmount] = useState("")
+  const [indivGuarantorId, setIndivGuarantorId] = useState("")
+  const [indivGuarantorPhone, setIndivGuarantorPhone] = useState("")
   const [indivSubmitting, setIndivSubmitting] = useState(false)
   const [indivError, setIndivError] = useState(null)
 
@@ -128,6 +134,8 @@ export default function LoanRequests() {
     setIndivOpen(false)
     setIndivPhone("")
     setIndivAmount("")
+    setIndivGuarantorId("")
+    setIndivGuarantorPhone("")
     setIndivError(null)
   }
 
@@ -137,7 +145,9 @@ export default function LoanRequests() {
     setIndivError(null)
     try {
       const phone = indivPhone.trim()
-      const file = await buildIndividualLoanFile(phone, indivAmount)
+      const guarantorId = indivGuarantorId.trim()
+      const guarantorPhone = indivGuarantorPhone.trim()
+      const file = await buildIndividualLoanFile(phone, indivAmount, guarantorId, guarantorPhone)
       const body = new FormData()
       body.append("file", file)
       body.append("loan_period", `${period}-01`)
@@ -147,6 +157,8 @@ export default function LoanRequests() {
       setIndivOpen(false)
       setIndivPhone("")
       setIndivAmount("")
+      setIndivGuarantorId("")
+      setIndivGuarantorPhone("")
       refetch()
     } catch (err) {
       setIndivError(err.message || "Could not submit loan request.")
@@ -278,6 +290,26 @@ export default function LoanRequests() {
               placeholder="5000"
               value={indivAmount}
               onChange={(e) => setIndivAmount(e.target.value)}
+              required
+            />
+          </Field>
+          <Field label="Guarantor ID number" required>
+            <Input
+              type="text"
+              name="guarantor_id_number"
+              placeholder="12345678"
+              value={indivGuarantorId}
+              onChange={(e) => setIndivGuarantorId(e.target.value)}
+              required
+            />
+          </Field>
+          <Field label="Guarantor phone number" required>
+            <Input
+              type="tel"
+              name="guarantor_phone_number"
+              placeholder="254798765432"
+              value={indivGuarantorPhone}
+              onChange={(e) => setIndivGuarantorPhone(e.target.value)}
               required
             />
           </Field>
