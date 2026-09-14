@@ -195,6 +195,7 @@ login: (data) =>
   customerRegistration: (pk) => api.get(`/api/customers/registrations/${pk}/`),
   createCustomerRegistration: (formData) => api.postForm("/api/customers/registrations/", formData),
   customerRegistrationStatus: (pk) => api.get(`/api/customers/registrations/${pk}/status/`),
+  syncCustomerRegistrationStatus: (pk) => api.post(`/api/customers/registrations/${pk}/sync-status/`),
 
   // System health
   health: () => api.get("/api/v1/health/"),

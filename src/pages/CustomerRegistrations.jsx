@@ -85,6 +85,21 @@ export default function CustomerRegistrations() {
   const [msg, setMsg] = useState(null)
 
   const registrations = Array.isArray(data) ? data : data?.results || []
+  const [syncingId, setSyncingId] = useState(null)
+
+  async function handleSyncStatus(registration) {
+    setSyncingId(registration.id)
+    setMsg(null)
+    try {
+      await endpoints.syncCustomerRegistrationStatus(registration.id)
+      setMsg({ variant: "success", text: `Status synced for ${registration.first_name} ${registration.last_name}.` })
+      refetch()
+    } catch (err) {
+      setMsg({ variant: "error", text: err.message || "Could not sync status." })
+    } finally {
+      setSyncingId(null)
+    }
+  }
 
   function update(key, value) {
     setForm((f) => ({ ...f, [key]: value }))
@@ -162,6 +177,20 @@ export default function CustomerRegistrations() {
     { key: "kyc", header: "KYC Documents", render: (r) => <span className="registration-kyc-summary">{kycSummary(r.kyc_documents)}</span> },
     { key: "submitted_by", header: "Submitted by", render: (r) => r.submitted_by_name || "—" },
     { key: "date", header: "Submitted", render: (r) => formatDate(r.date_created) },
+    {
+      key: "actions",
+      header: "",
+      render: (r) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleSyncStatus(r)}
+          disabled={syncingId === r.id}
+        >
+          {syncingId === r.id ? "Syncing…" : "Sync status"}
+        </Button>
+      ),
+    },
   ]
 
   const isNationalId = form.identity_type_name === "National ID"
