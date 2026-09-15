@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import AuthShell from "../components/AuthShell.jsx"
-import { Button, Input, Alert } from "../components/ui.jsx"
+import { Button, PasswordInput, Alert } from "../components/ui.jsx"
 import { endpoints } from "../lib/api.js"
 
 export default function PasswordResetConfirm() {
@@ -49,8 +49,8 @@ export default function PasswordResetConfirm() {
     >
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <Alert>{error}</Alert>
-        <Input label="New password" name="new_password" type="password" required minLength={8} value={form.new_password} onChange={update("new_password")} />
-        <Input label="Confirm password" name="confirm_password" type="password" required value={form.confirm_password} onChange={update("confirm_password")} />
+        <PasswordInput label="New password" name="new_password" required minLength={8} value={form.new_password} onChange={update("new_password")} />
+        <PasswordInput label="Confirm password" name="confirm_password" required value={form.confirm_password} onChange={update("confirm_password")} />
         <Button type="submit" size="lg" className="login-submit" disabled={submitting}>
           {submitting ? "Resetting…" : "Reset password"}
         </Button>

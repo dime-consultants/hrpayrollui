@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import AuthShell from "../components/AuthShell.jsx"
-import { Button, Input, Alert } from "../components/ui.jsx"
+import { Button, Input, PasswordInput, Alert } from "../components/ui.jsx"
 import { useAuth } from "../context/AuthContext.jsx"
 import "./Login.css"
 
@@ -47,10 +47,9 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@company.com"
         />
-        <Input
+        <PasswordInput
           label="Password"
           name="password"
-          type="password"
           autoComplete="current-password"
           required
           value={password}

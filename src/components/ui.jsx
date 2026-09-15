@@ -1,3 +1,5 @@
+import { useState } from "react"
+import { IconEye, IconEyeOff } from "./icons.jsx"
 import "./ui.css"
 
 export function Button({ as: Comp = "button", variant = "primary", size = "md", className = "", ...props }) {
@@ -40,6 +42,30 @@ export function Input({ label, error, className = "", id, ...props }) {
         <label htmlFor={inputId} className="input-label">{label}</label>
       )}
       <input id={inputId} className="input" {...props} />
+      {error && <p className="input-error">{error}</p>}
+    </div>
+  )
+}
+
+export function PasswordInput({ label, error, className = "", id, ...props }) {
+  const [visible, setVisible] = useState(false)
+  const inputId = id || props.name
+  return (
+    <div className={`input-wrap ${className}`}>
+      {label && (
+        <label htmlFor={inputId} className="input-label">{label}</label>
+      )}
+      <div className="password-field">
+        <input id={inputId} className="input" type={visible ? "text" : "password"} {...props} />
+        <button
+          type="button"
+          className="password-toggle-btn"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? "Hide password" : "Show password"}
+        >
+          {visible ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+        </button>
+      </div>
       {error && <p className="input-error">{error}</p>}
     </div>
   )

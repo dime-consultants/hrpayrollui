@@ -1,7 +1,7 @@
 import { useState } from "react"
 import PageHeader from "../components/PageHeader.jsx"
 import { DataTable } from "../components/Table.jsx"
-import { Badge, Button, Card, Field, Input, Select, Modal, Alert } from "../components/ui.jsx"
+import { Badge, Button, Card, Field, Input, PasswordInput, Select, Modal, Alert } from "../components/ui.jsx"
 import { useFetch } from "../lib/useFetch.js"
 import { api } from "../lib/api.js"
 import { formatDate } from "../lib/format.js"
@@ -119,7 +119,7 @@ export default function Users() {
             </Select>
           </Field>
           <Field label="Temporary password" required>
-            <Input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} required />
+            <PasswordInput value={form.password} onChange={(e) => update("password", e.target.value)} required />
           </Field>
         </form>
       </Modal>
