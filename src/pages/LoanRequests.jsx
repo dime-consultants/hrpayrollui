@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import PageHeader from "../components/PageHeader.jsx"
 import { DataTable } from "../components/Table.jsx"
-import { Badge, Button, Card, Alert, Modal, Field, Input } from "../components/ui.jsx"
+import { Badge, Button, Card, Alert, Modal, Field, Input, Select } from "../components/ui.jsx"
 import { useFetch } from "../lib/useFetch.js"
 import { endpoints } from "../lib/api.js"
 import { formatDate } from "../lib/format.js"
@@ -10,35 +10,90 @@ import { loanStatusVariant } from "../lib/statusVariants.js"
 import "./Uploads.css"
 import "./LoanRequests.css"
 
+// Numbered guarantor_N_id_number / guarantor_N_phone_number column pairs —
+// the backend parses however many pairs are present, so a batch isn't
+// capped at the number of pairs the template ships with by default.
+function guarantorColumnHeaders(count) {
+  const headers = []
+  for (let i = 1; i <= count; i++) {
+    headers.push(`guarantor_${i}_id_number`, `guarantor_${i}_phone_number`)
+  }
+  return headers
+}
+
+function guarantorColumnValues(guarantors) {
+  const values = []
+  for (const g of guarantors) {
+    values.push(g.id_number, g.phone_number)
+  }
+  return values
+}
+
+function markPhoneColumnsAsText(worksheet, headers) {
+  headers.forEach((header, i) => {
+    if (!header.includes("phone")) return
+    const cell = worksheet[`${XLSX_COL(i)}2`]
+    if (cell) {
+      cell.t = "s"
+      cell.z = "@"
+    }
+  })
+}
+
+function XLSX_COL(i) {
+  // 0 -> A, 1 -> B, ...
+  return String.fromCharCode(65 + i)
+}
+
+// The loan product the employee is requesting. Kept in one place so the
+// template, the individual-request dropdown, and the batch view all agree
+// on the same three options.
+const PRODUCT_OPTIONS = [
+  { value: "cash", label: "Cash" },
+  { value: "pata_gadget", label: "Pata Gadget" },
+  { value: "shiba_na_dime", label: "Shiba na Dime" },
+]
+
+function productLabel(value) {
+  return PRODUCT_OPTIONS.find((p) => p.value === value)?.label || value || "Cash"
+}
+
+// The bundled `xlsx` build can't write real in-cell dropdown validation, so
+// instead of a fake/broken dropdown we ship a second reference sheet listing
+// the valid values — self-documenting without touching the parsed data
+// sheet at all. (A same-sheet legend was tried and reverted: the backend
+// reads the sheet's whole used range, so any legend-only row — one with no
+// real loan data but a non-blank legend cell — was wrongly parsed as a
+// malformed data row instead of being skipped as blank.)
+function addProductOptionsSheet(XLSX, workbook) {
+  const legend = XLSX.utils.aoa_to_sheet([
+    ["Valid product values"],
+    ...PRODUCT_OPTIONS.map((p) => [p.label]),
+  ])
+  legend["!cols"] = [{ wch: 24 }]
+  XLSX.utils.book_append_sheet(workbook, legend, "Product Options")
+}
+
 async function downloadLoanRequestTemplate() {
   const XLSX = await import("xlsx")
-  const worksheet = XLSX.utils.aoa_to_sheet([
-    ["phone_number", "amount", "guarantor_id_number", "guarantor_phone_number"],
-    ["'254712345678", "5000", "12345678", "'254798765432"],
-  ])
-  // Force the phone_number and guarantor_phone_number columns to Text so
-  // Excel doesn't strip the leading apostrophe or coerce the value into a number.
-  worksheet["A2"].t = "s"
-  worksheet["A2"].z = "@"
-  worksheet["D2"].t = "s"
-  worksheet["D2"].z = "@"
-  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }, { wch: 20 }, { wch: 22 }]
+  const headers = ["phone_number", "amount", "product", ...guarantorColumnHeaders(2)]
+  const sampleRow = ["'254712345678", "5000", "Cash", "12345678", "'254798765432", "87654321", "'254711223344"]
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, sampleRow])
+  markPhoneColumnsAsText(worksheet, headers)
+  worksheet["!cols"] = headers.map((h) => ({ wch: h.includes("guarantor") ? 22 : 18 }))
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
+  addProductOptionsSheet(XLSX, workbook)
   XLSX.writeFile(workbook, "loan_request_template.xlsx")
 }
 
-async function buildIndividualLoanFile(phoneNumber, amount, guarantorIdNumber, guarantorPhoneNumber) {
+async function buildIndividualLoanFile(phoneNumber, amount, product, guarantors) {
   const XLSX = await import("xlsx")
-  const worksheet = XLSX.utils.aoa_to_sheet([
-    ["phone_number", "amount", "guarantor_id_number", "guarantor_phone_number"],
-    [phoneNumber, amount, guarantorIdNumber, guarantorPhoneNumber],
-  ])
-  worksheet["A2"].t = "s"
-  worksheet["A2"].z = "@"
-  worksheet["D2"].t = "s"
-  worksheet["D2"].z = "@"
-  worksheet["!cols"] = [{ wch: 18 }, { wch: 12 }, { wch: 20 }, { wch: 22 }]
+  const headers = ["phone_number", "amount", "product", ...guarantorColumnHeaders(guarantors.length)]
+  const row = [phoneNumber, amount, productLabel(product), ...guarantorColumnValues(guarantors)]
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, row])
+  markPhoneColumnsAsText(worksheet, headers)
+  worksheet["!cols"] = headers.map((h) => ({ wch: h.includes("guarantor") ? 22 : 18 }))
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, "Loan Requests")
   const buffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" })
@@ -89,8 +144,8 @@ export default function LoanRequests() {
   const [indivOpen, setIndivOpen] = useState(false)
   const [indivPhone, setIndivPhone] = useState("")
   const [indivAmount, setIndivAmount] = useState("")
-  const [indivGuarantorId, setIndivGuarantorId] = useState("")
-  const [indivGuarantorPhone, setIndivGuarantorPhone] = useState("")
+  const [indivProduct, setIndivProduct] = useState(PRODUCT_OPTIONS[0].value)
+  const [indivGuarantors, setIndivGuarantors] = useState([{ id_number: "", phone_number: "" }])
   const [indivSubmitting, setIndivSubmitting] = useState(false)
   const [indivError, setIndivError] = useState(null)
 
@@ -134,20 +189,39 @@ export default function LoanRequests() {
     setIndivOpen(false)
     setIndivPhone("")
     setIndivAmount("")
-    setIndivGuarantorId("")
-    setIndivGuarantorPhone("")
+    setIndivProduct(PRODUCT_OPTIONS[0].value)
+    setIndivGuarantors([{ id_number: "", phone_number: "" }])
     setIndivError(null)
+  }
+
+  function updateGuarantor(index, field, value) {
+    setIndivGuarantors((list) => list.map((g, i) => (i === index ? { ...g, [field]: value } : g)))
+  }
+
+  function addGuarantor() {
+    setIndivGuarantors((list) => [...list, { id_number: "", phone_number: "" }])
+  }
+
+  function removeGuarantor(index) {
+    setIndivGuarantors((list) => list.filter((_, i) => i !== index))
   }
 
   async function handleIndividualSubmit(e) {
     e.preventDefault()
-    setIndivSubmitting(true)
     setIndivError(null)
+
+    const guarantors = indivGuarantors
+      .map((g) => ({ id_number: g.id_number.trim(), phone_number: g.phone_number.trim() }))
+      .filter((g) => g.id_number || g.phone_number)
+    if (guarantors.length === 0 || guarantors.some((g) => !g.id_number || !g.phone_number)) {
+      setIndivError("Each guarantor needs both an ID number and a phone number.")
+      return
+    }
+
+    setIndivSubmitting(true)
     try {
       const phone = indivPhone.trim()
-      const guarantorId = indivGuarantorId.trim()
-      const guarantorPhone = indivGuarantorPhone.trim()
-      const file = await buildIndividualLoanFile(phone, indivAmount, guarantorId, guarantorPhone)
+      const file = await buildIndividualLoanFile(phone, indivAmount, indivProduct, guarantors)
       const body = new FormData()
       body.append("file", file)
       body.append("loan_period", `${period}-01`)
@@ -157,8 +231,8 @@ export default function LoanRequests() {
       setIndivOpen(false)
       setIndivPhone("")
       setIndivAmount("")
-      setIndivGuarantorId("")
-      setIndivGuarantorPhone("")
+      setIndivProduct(PRODUCT_OPTIONS[0].value)
+      setIndivGuarantors([{ id_number: "", phone_number: "" }])
       refetch()
     } catch (err) {
       setIndivError(err.message || "Could not submit loan request.")
@@ -293,26 +367,43 @@ export default function LoanRequests() {
               required
             />
           </Field>
-          <Field label="Guarantor ID number" required>
-            <Input
-              type="text"
-              name="guarantor_id_number"
-              placeholder="12345678"
-              value={indivGuarantorId}
-              onChange={(e) => setIndivGuarantorId(e.target.value)}
-              required
-            />
+          <Field label="Product" required>
+            <Select value={indivProduct} onChange={(e) => setIndivProduct(e.target.value)} required>
+              {PRODUCT_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </Select>
           </Field>
-          <Field label="Guarantor phone number" required>
-            <Input
-              type="tel"
-              name="guarantor_phone_number"
-              placeholder="254798765432"
-              value={indivGuarantorPhone}
-              onChange={(e) => setIndivGuarantorPhone(e.target.value)}
-              required
-            />
-          </Field>
+          {indivGuarantors.map((g, i) => (
+            <div key={i} className="guarantor-row">
+              <Field label={`Guarantor ${i + 1} ID number`} required>
+                <Input
+                  type="text"
+                  placeholder="12345678"
+                  value={g.id_number}
+                  onChange={(e) => updateGuarantor(i, "id_number", e.target.value)}
+                  required
+                />
+              </Field>
+              <Field label={`Guarantor ${i + 1} phone number`} required>
+                <Input
+                  type="tel"
+                  placeholder="254798765432"
+                  value={g.phone_number}
+                  onChange={(e) => updateGuarantor(i, "phone_number", e.target.value)}
+                  required
+                />
+              </Field>
+              {indivGuarantors.length > 1 && (
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeGuarantor(i)}>
+                  Remove
+                </Button>
+              )}
+            </div>
+          ))}
+          <Button type="button" variant="ghost" size="sm" onClick={addGuarantor}>
+            + Add guarantor
+          </Button>
         </form>
       </Modal>
     </div>
