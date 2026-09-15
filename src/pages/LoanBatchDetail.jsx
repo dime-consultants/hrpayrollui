@@ -9,6 +9,22 @@ import { formatDate, formatMoney, shortId } from "../lib/format.js";
 import { loanStatusVariant } from "../lib/statusVariants.js";
 import "./LoanRequests.css";
 
+const PRODUCT_LABELS = {
+  cash: "Cash",
+  pata_gadget: "Pata Gadget",
+  shiba_na_dime: "Shiba na Dime",
+};
+
+const PRODUCT_BADGE_VARIANT = {
+  cash: "green",
+  pata_gadget: "blue",
+  shiba_na_dime: "indigo",
+};
+
+function productLabel(value) {
+  return PRODUCT_LABELS[value] || value || "Cash";
+}
+
 export default function LoanBatchDetail() {
   const { id } = useParams();
   const {
@@ -57,11 +73,19 @@ export default function LoanBatchDetail() {
   const pendingCount    = requestsLoaded ? tally.pending    : (batch?.skipped_count    ?? 0);
   const flaggedCount    = ineligibleCount + failedCount;
 
+  // Per-product breakdown so an admin can see the batch's product mix at a
+  // glance (e.g. "2 Cash · 1 Pata Gadget") without opening every row.
+  const productTally = requests.reduce((acc, r) => {
+    const key = r.product || "cash";
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
   const [search, setSearch] = useState("");
   const query = search.trim().toLowerCase();
   const filteredRequests = query
     ? requests.filter((r) =>
-        [r.employee_name, r.phone_number, r.employee_id]
+        [r.employee_name, r.phone_number, r.employee_id, productLabel(r.product)]
           .filter(Boolean)
           .some((field) => String(field).toLowerCase().includes(query)),
       )
@@ -82,21 +106,33 @@ export default function LoanBatchDetail() {
       ),
     },
     {
-      key: "guarantor",
-      header: "Guarantor",
-      render: (r) => (
-        <div>
-          <div style={{ fontWeight: 500 }}>{r.guarantor_id_number || "—"}</div>
-          <div style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>
-            {r.guarantor_phone_number}
-          </div>
-        </div>
-      ),
-    },
-    {
       key: "amount",
       header: "Requested",
       render: (r) => formatMoney(r.requested_amount),
+    },
+    {
+      key: "product",
+      header: "Product",
+      render: (r) => <Badge variant={PRODUCT_BADGE_VARIANT[r.product] || "slate"}>{productLabel(r.product)}</Badge>,
+    },
+    {
+      key: "guarantor",
+      header: "Guarantor(s)",
+      render: (r) =>
+        Array.isArray(r.guarantors) && r.guarantors.length > 0 ? (
+          <div>
+            {r.guarantors.map((g, i) => (
+              <div key={i} style={{ marginBottom: i < r.guarantors.length - 1 ? "0.375rem" : 0 }}>
+                <div style={{ fontWeight: 500 }}>{g.id_number}</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--gray-500)" }}>
+                  {g.phone_number}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          "—"
+        ),
     },
     {
       key: "status",
@@ -183,6 +219,15 @@ export default function LoanBatchDetail() {
             </Badge>
           </div>
         </div>
+        {Object.keys(productTally).length > 0 && (
+          <div className="loan-section-header" style={{ borderTop: 0, paddingTop: 0, gap: "0.5rem" }}>
+            {Object.entries(productTally).map(([product, count]) => (
+              <Badge key={product} variant={PRODUCT_BADGE_VARIANT[product] || "slate"}>
+                {count} {productLabel(product)}
+              </Badge>
+            ))}
+          </div>
+        )}
         <DataTable
           columns={columns}
           rows={filteredRequests}
