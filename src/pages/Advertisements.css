@@ -1,0 +1,137 @@
+.advertisement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.advertisement-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.advertisement-textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-lg);
+  padding: 0.625rem 0.75rem;
+  font: inherit;
+  color: var(--gray-900);
+}
+.advertisement-file {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px dashed var(--blue-300);
+  border-radius: var(--radius-lg);
+  background: var(--blue-50);
+  color: var(--gray-700);
+}
+.advertisement-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  color: var(--gray-900);
+  font: inherit;
+}
+.advertisement-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+}
+.advertisement-management-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: linear-gradient(110deg, #f0f9ff, #ffffff 65%);
+}
+.advertisement-management-intro h2 {
+  margin: 0.2rem 0;
+  color: var(--gray-900);
+  font-size: 1.25rem;
+}
+.advertisement-management-intro p {
+  margin: 0;
+  color: var(--gray-500);
+}
+.advertisement-management-intro strong {
+  color: var(--blue-700);
+  white-space: nowrap;
+}
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--blue-600) !important;
+}
+.advertisement-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.advertisement-admin-card {
+  overflow: hidden;
+}
+.advertisement-admin-card > img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+.advertisement-admin-card-body {
+  padding: 1rem;
+}
+.advertisement-admin-card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--gray-500);
+  font-size: 0.75rem;
+}
+.advertisement-admin-card h3 {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1rem;
+  color: var(--gray-900);
+}
+.advertisement-admin-card p {
+  margin: 0;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.advertisement-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.advertisement-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--gray-500);
+}
+
+@media (max-width: 900px) {
+  .advertisement-admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .advertisement-form-grid,
+  .advertisement-admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .advertisement-management-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

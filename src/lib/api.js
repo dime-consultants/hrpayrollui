@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE =  "https://hr.dimeapp.co.ke";
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  (import.meta.env.DEV ? "" : "https://hr.dimeapp.co.ke");
 
 const TOKEN_KEY = "hrp_access";
 const REFRESH_KEY = "hrp_refresh";
@@ -141,8 +143,10 @@ export const api = {
 // ---- Endpoint helpers mapped to Django URL patterns ----
 export const endpoints = {
   // Auth — custom User uses email as USERNAME_FIELD
-login: (data) =>
-    client.post("/api/v1/auth/login/", data, { _noAuth: true }).then((r) => r.data),
+  login: (data) =>
+    client
+      .post("/api/v1/auth/login/", data, { _noAuth: true })
+      .then((r) => r.data),
   tokenRefresh: (refresh) =>
     client.post("/api/v1/auth/refresh/", { refresh }).then((r) => r.data),
 
@@ -169,9 +173,12 @@ login: (data) =>
   upload: (pk) => api.get(`/api/v1/uploads/${pk}/`),
   createUpload: (formData) => api.postForm("/api/v1/uploads/", formData),
   deleteUpload: (pk) => api.del(`/api/v1/uploads/${pk}/`),
-  uploadDeductions: (uploadId) => api.get("/api/v1/deductions/", { upload: uploadId, page_size: 500 }),
+  uploadDeductions: (uploadId) =>
+    api.get("/api/v1/deductions/", { upload: uploadId, page_size: 500 }),
   downloadTemplate: () =>
-    client.get("/api/v1/uploads/template/", { responseType: "blob" }).then((r) => r.data),
+    client
+      .get("/api/v1/uploads/template/", { responseType: "blob" })
+      .then((r) => r.data),
 
   // Salary deductions
   deductions: (params) => api.get("/api/v1/deductions/", params),
@@ -180,7 +187,8 @@ login: (data) =>
   // Repayment batches
   batches: (params) => api.get("/api/v1/batches/", params),
   batch: (pk) => api.get(`/api/v1/batches/${pk}/`),
-  approveBatch: (pk) => api.post(`/api/v1/batches/${pk}/approve/`, { confirm: true }),
+  approveBatch: (pk) =>
+    api.post(`/api/v1/batches/${pk}/approve/`, { confirm: true }),
 
   // Repayment records
   records: (params) => api.get("/api/v1/records/", params),
@@ -190,19 +198,34 @@ login: (data) =>
   loanUpload: (pk) => api.get(`/api/loans/uploads/${pk}/`),
   createLoanUpload: (formData) => api.postForm("/api/loans/uploads/", formData),
   loanUploadStatus: (pk) => api.get(`/api/loans/uploads/${pk}/status/`),
-  loanUploadRequests: (uploadId, params) => api.get(`/api/loans/uploads/${uploadId}/requests/`, params),
+  loanUploadRequests: (uploadId, params) =>
+    api.get(`/api/loans/uploads/${uploadId}/requests/`, params),
 
   // Loan request batches
   loanBatches: (params) => api.get("/api/loans/batches/", params),
   loanBatch: (pk) => api.get(`/api/loans/batches/${pk}/`),
 
   // Customer registrations (KYC onboarding — note: mounted at /api/customers/)
-  customerRegistrations: (params) => api.get("/api/customers/registrations/", params),
+  customerRegistrations: (params) =>
+    api.get("/api/customers/registrations/", params),
   customerRegistration: (pk) => api.get(`/api/customers/registrations/${pk}/`),
-  createCustomerRegistration: (formData) => api.postForm("/api/customers/registrations/", formData),
-  customerRegistrationStatus: (pk) => api.get(`/api/customers/registrations/${pk}/status/`),
-  syncCustomerRegistrationStatus: (pk) => api.post(`/api/customers/registrations/${pk}/sync-status/`),
+  createCustomerRegistration: (formData) =>
+    api.postForm("/api/customers/registrations/", formData),
+  customerRegistrationStatus: (pk) =>
+    api.get(`/api/customers/registrations/${pk}/status/`),
+  syncCustomerRegistrationStatus: (pk) =>
+    api.post(`/api/customers/registrations/${pk}/sync-status/`),
 
   // System health
   health: () => api.get("/api/v1/health/"),
+
+  // Dashboard advertisements
+  advertisements: (manage = false) =>
+    api.get(`/api/v1/advertisements/${manage ? "?manage=true" : ""}`),
+  advertisement: (id) => api.get(`/api/v1/advertisements/${id}/`),
+  createAdvertisement: (formData) =>
+    api.postForm("/api/v1/advertisements/", formData),
+  updateAdvertisement: (id, formData) =>
+    api.patch(`/api/v1/advertisements/${id}/`, formData),
+  deleteAdvertisement: (id) => api.del(`/api/v1/advertisements/${id}/`),
 };
