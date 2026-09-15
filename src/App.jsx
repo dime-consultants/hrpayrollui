@@ -21,6 +21,8 @@ import LoanBatches from "./pages/LoanBatches.jsx";
 import LoanBatchDetail from "./pages/LoanBatchDetail.jsx";
 import Profile from "./pages/Profile.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import Advertisements from "./pages/Advertisements.jsx";
+import AdvertisementDetail from "./pages/AdvertisementDetail.jsx";
 
 function FullPageLoader() {
   return (
@@ -81,6 +83,22 @@ export default function App() {
         element={
           <Protected>
             <Dashboard />
+          </Protected>
+        }
+      />
+      <Route
+        path="/advertisements"
+        element={
+          <Protected>
+            <Advertisements />
+          </Protected>
+        }
+      />
+      <Route
+        path="/advertisements/:id"
+        element={
+          <Protected>
+            <AdvertisementDetail />
           </Protected>
         }
       />

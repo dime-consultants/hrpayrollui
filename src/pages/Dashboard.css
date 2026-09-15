@@ -12,11 +12,15 @@
 }
 
 @media (min-width: 640px) {
-  .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1280px) {
-  .dashboard-stats { grid-template-columns: repeat(3, 1fr); }
+  .dashboard-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .stat-card-icon-wrap {
@@ -29,11 +33,26 @@
   flex-shrink: 0;
 }
 
-.stat-card-icon-wrap.tone-blue    { background: var(--blue-50);  color: var(--blue-700); }
-.stat-card-icon-wrap.tone-green   { background: #ecfdf5;          color: #065f46; }
-.stat-card-icon-wrap.tone-amber   { background: #fffbeb;          color: #92400e; }
-.stat-card-icon-wrap.tone-red     { background: #fef2f2;          color: #991b1b; }
-.stat-card-icon-wrap.tone-slate   { background: var(--gray-100);  color: var(--gray-600); }
+.stat-card-icon-wrap.tone-blue {
+  background: var(--blue-50);
+  color: var(--blue-700);
+}
+.stat-card-icon-wrap.tone-green {
+  background: #ecfdf5;
+  color: #065f46;
+}
+.stat-card-icon-wrap.tone-amber {
+  background: #fffbeb;
+  color: #92400e;
+}
+.stat-card-icon-wrap.tone-red {
+  background: #fef2f2;
+  color: #991b1b;
+}
+.stat-card-icon-wrap.tone-slate {
+  background: var(--gray-100);
+  color: var(--gray-600);
+}
 
 .stat-card-row {
   display: flex;
@@ -85,4 +104,138 @@
   align-items: center;
   justify-content: center;
   padding: 5rem 0;
+}
+
+.dashboard-events {
+  margin-top: 1.5rem;
+}
+.dashboard-events-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.dashboard-events-heading h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--gray-900);
+}
+.dashboard-events-heading p {
+  margin: 0.35rem 0 0;
+  color: var(--gray-500);
+  font-size: 0.875rem;
+}
+.dashboard-events-count {
+  color: var(--blue-600);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.dashboard-events-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.event-card {
+  overflow: hidden;
+  min-width: 0;
+}
+.event-card-image-wrap {
+  aspect-ratio: 1.35 / 1;
+  overflow: hidden;
+  background: var(--gray-100);
+}
+.event-card-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.event-card-body {
+  display: flex;
+  min-height: 14rem;
+  flex-direction: column;
+  padding: 1rem;
+}
+.event-card-date {
+  margin: 0 0 0.7rem;
+  color: var(--blue-600);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.event-card-body h3 {
+  margin: 0;
+  color: var(--gray-900);
+  font-size: 1rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.event-card-description {
+  margin: 0.65rem 0 0;
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.event-card-location {
+  margin: auto 0 0;
+  padding-top: 0.75rem;
+  color: var(--gray-500);
+  font-size: 0.75rem;
+}
+.event-card-price {
+  margin: 0.7rem 0 0;
+  color: var(--blue-600);
+  font-size: 1rem;
+  font-weight: 800;
+}
+.dashboard-events-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+.dashboard-events-empty {
+  padding: 3rem 1rem;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  background: var(--white);
+}
+.dashboard-events-empty h3 {
+  margin: 0;
+  color: var(--gray-900);
+}
+.dashboard-events-empty p {
+  margin: 0.5rem 0 0;
+  color: var(--gray-500);
+}
+
+@media (max-width: 1100px) {
+  .dashboard-events-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .dashboard-events-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .dashboard-events-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.875rem;
+    padding-bottom: 0.5rem;
+    scroll-snap-type: x mandatory;
+  }
+  .event-card {
+    flex: 0 0 min(82vw, 20rem);
+    scroll-snap-align: start;
+  }
 }
