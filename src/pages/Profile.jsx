@@ -1,27 +1,30 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import PageHeader from "../components/PageHeader.jsx"
 import { Button, Card, Field, Input, Alert, Badge } from "../components/ui.jsx"
 import { useAuth } from "../context/AuthContext.jsx"
 import { useFetch } from "../lib/useFetch.js"
-import { api, endpoints } from "../lib/api.js"
+import { endpoints } from "../lib/api.js"
 import { roleLabel } from "../lib/format.js"
 import "./Profile.css"
 
 export default function Profile() {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
 
-  // The login response doesn't carry the HR role, so look up the current
-  // user's HRUser record (which does) from the org's user list.
+  // The login response doesn't carry first/last name or the HR role, so
+  // both come from separate lookups rather than the cached auth user.
   const { data: usersData } = useFetch(() => endpoints.users(), [])
   const hrUsers = Array.isArray(usersData) ? usersData : usersData?.results || []
   const currentHrUser = hrUsers.find((u) => u.email === user?.email)
 
-  const [form, setForm] = useState({
-    first_name: user?.first_name || "",
-    last_name: user?.last_name || "",
-  })
+  const { data: profile } = useFetch(() => endpoints.getProfile(), [])
+
+  const [form, setForm] = useState({ first_name: "", last_name: "" })
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState(null)
+
+  useEffect(() => {
+    if (profile) setForm({ first_name: profile.first_name || "", last_name: profile.last_name || "" })
+  }, [profile])
 
   function update(key, value) { setForm((f) => ({ ...f, [key]: value })) }
 
@@ -30,7 +33,9 @@ export default function Profile() {
     setSaving(true)
     setMsg(null)
     try {
-      await api.patch("/api/users/me/", form)
+      const updated = await endpoints.updateProfile(form)
+      const full_name = [updated.first_name, updated.last_name].filter(Boolean).join(" ")
+      setUser({ ...user, first_name: updated.first_name, last_name: updated.last_name, full_name })
       setMsg({ variant: "success", text: "Profile updated successfully." })
     } catch (err) {
       setMsg({ variant: "error", text: err.message || "Could not update profile." })

@@ -291,6 +291,10 @@ export default function LoanRequests() {
               : <p className="upload-dropzone-primary">Click or drag to select a file</p>
             }
             <p className="upload-dropzone-secondary">XLS or XLSX — up to 10 MB</p>
+            <p className="upload-dropzone-secondary">
+              Each row needs at least one guarantor (more encouraged) — a guarantor cannot
+              already be guaranteeing another active loan.
+            </p>
             <input
               type="file"
               accept=".xls,.xlsx"
@@ -374,6 +378,10 @@ export default function LoanRequests() {
               ))}
             </Select>
           </Field>
+          <p className="form-hint">
+            A guarantor cannot already be guaranteeing another active loan. At least one
+            guarantor is required — providing more than one is encouraged.
+          </p>
           {indivGuarantors.map((g, i) => (
             <div key={i} className="guarantor-row">
               <Field label={`Guarantor ${i + 1} ID number`} required>

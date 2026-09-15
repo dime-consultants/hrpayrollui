@@ -157,6 +157,12 @@ login: (data) =>
   user: (pk) => api.get(`/api/v1/users/${pk}/`),
   createUser: (data) => api.post("/api/v1/users/", data),
   deactivateUser: (pk) => api.del(`/api/v1/users/${pk}/`),
+  getProfile: () => api.get("/api/v1/users/me/"),
+  updateProfile: (data) => api.patch("/api/v1/users/me/", data),
+
+  // Password reset
+  requestPasswordReset: (email) => api.post("/api/v1/auth/password/reset/", { email }),
+  confirmPasswordReset: (data) => api.post("/api/v1/auth/password/reset/confirm/", data),
 
   // Payroll uploads
   uploads: (params) => api.get("/api/v1/uploads/", params),

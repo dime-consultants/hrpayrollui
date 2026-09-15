@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import AuthShell from "../components/AuthShell.jsx"
 import { Button, Input, Alert } from "../components/ui.jsx"
+import { endpoints } from "../lib/api.js"
 
 export default function PasswordReset() {
   const [email, setEmail] = useState("")
@@ -14,6 +15,7 @@ export default function PasswordReset() {
     setError("")
     setSubmitting(true)
     try {
+      await endpoints.requestPasswordReset(email)
       setDone(true)
     } catch (err) {
       setError(err.message || "Unable to request password reset.")
